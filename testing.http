@@ -1,0 +1,95 @@
+POST http://localhost:4000/signin HTTP/1.1
+content-type: application/json
+
+{
+    "alias": "PIPO123",
+    "password": "bruh12345"
+}
+
+###
+
+POST http://localhost:4000/signup HTTP/1.1
+content-type: application/json
+
+{
+    "name": "PIPO",
+    "lname": "POPIPO",
+    "email": "ROFLMAO@gmail.com",
+    "alias": "PIPO789",
+    "bios": "I am PIPO's brother's brother",
+    "password": "bruh12345"
+}
+
+###
+
+POST http://localhost:4000/createTweet/PIPO456 HTTP/1.1
+content-type: application/json
+
+{
+    "desc": "Prueba de Tweet",
+    "image": "https://i.imgur.com/MxcAKha.jpeg"
+}
+
+###
+
+GET http://localhost:4000/showAllTweetsNew HTTP/1.1
+
+###
+
+GET http://localhost:4000/showAllTweetsOld HTTP/1.1
+
+###
+
+GET http://localhost:4000/showAllTweetsLiked/PIPO123 HTTP/1.1
+
+###
+
+GET http://localhost:4000/showAllFollowedTweets/PIPO123 HTTP/1.1
+
+###
+
+GET http://localhost:4000/like/PIPO123/:tweetid HTTP/1.1
+
+###
+
+GET http://localhost:4000/follow/PIPO123/Al_123 HTTP/1.1
+
+###
+
+POST http://localhost:4000/createComment/PIPO456/654d30899066abc12da5c6c8 HTTP/1.1
+content-type: application/json
+
+{
+    "desc": "Prueba de Comentario, Extra Laaaaaargo... Bruh",
+    "image": "https://i.imgur.com/MxcAKha.jpeg"
+}
+
+###
+
+GET http://localhost:4000/commentCount/654d30899066abc12da5c6c8 HTTP/1.1
+
+###
+
+GET http://localhost:4000/likeCount/tweetid HTTP/1.1
+
+###
+
+DELETE http://localhost:4000/PIPO456/delete HTTP/1.1
+Content-Type: application/json
+
+{
+    "password": "bruh12345"
+}
+
+###
+
+POST http://localhost:4000/search HTTP/1.1
+Content-Type: application/json
+
+{
+    "query": "PI"
+}
+
+###
+
+GET http://localhost:4000/followCount/PIPO123 HTTP/1.1
