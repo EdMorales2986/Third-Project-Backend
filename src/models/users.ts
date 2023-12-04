@@ -44,15 +44,15 @@ const userSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["user", "critic"],
-    default: "user",
+    enum: ["public", "critic"],
+    default: "public",
     required: true,
   },
 });
 
-userSchema.virtual("lastName").get(function () {
-  return this.name.split(" ")[1];
-});
+// userSchema.virtual("lastName").get(function () {
+//   return this.name.split(" ")[1];
+// });
 
 // Register Password Encryption
 // This will run before any document.save()
@@ -75,4 +75,4 @@ userSchema.methods.comparePassword = async function (
   return await bcrypt.compare(password, this.password);
 };
 
-export default mongoose.model<IUser>("users", userSchema);
+export default mongoose.model<IUser>("USERS", userSchema);

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const users_1 = __importDefault(require("./users"));
+const movies_1 = __importDefault(require("./movies"));
 const reviewSchema = new mongoose_1.default.Schema({
     movieTitle: {
         type: String,
@@ -53,4 +54,37 @@ reviewSchema.virtual("ownerType").get(function () {
         }
     });
 });
-exports.default = mongoose_1.default.model("review", reviewSchema);
+reviewSchema.post("save", function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const movie = yield movies_1.default
+                .findOne({ title: this.movieTitle })
+                .lean();
+            if (!movie) {
+                return;
+            }
+            const type = yield this.get("ownerType");
+            switch (type) {
+                case "public":
+                    {
+                        movie.publicCount++;
+                        yield movie.save();
+                    }
+                    break;
+                case "critic":
+                    {
+                        movie.criticsCount++;
+                        yield movie.save();
+                    }
+                    break;
+                default:
+                    console.log(type);
+                    break;
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    });
+});
+exports.default = mongoose_1.default.model("REVIEWS", reviewSchema);

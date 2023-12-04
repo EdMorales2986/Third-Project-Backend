@@ -47,14 +47,14 @@ const userSchema = new mongoose_1.default.Schema({
     },
     type: {
         type: String,
-        enum: ["user", "critic"],
-        default: "user",
+        enum: ["public", "critic"],
+        default: "public",
         required: true,
     },
 });
-userSchema.virtual("lastName").get(function () {
-    return this.name.split(" ")[1];
-});
+// userSchema.virtual("lastName").get(function () {
+//   return this.name.split(" ")[1];
+// });
 // Register Password Encryption
 // This will run before any document.save()
 userSchema.pre("save", function (next) {
@@ -75,4 +75,4 @@ userSchema.methods.comparePassword = function (password) {
         return yield bcrypt_1.default.compare(password, this.password);
     });
 };
-exports.default = mongoose_1.default.model("users", userSchema);
+exports.default = mongoose_1.default.model("USERS", userSchema);

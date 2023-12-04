@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import users, { IUser } from "../models/users";
+import USERS, { IUser } from "../models/users";
 
 function createToken(user: IUser) {
   return jwt.sign(
@@ -16,18 +16,15 @@ function validateEmail(email: string) {
   return emailRegex.test(String(email).toLowerCase());
 }
 
-export const signUp = async function (
-  req: Request,
-  res: Response
-): Promise<Response> {
+export const signUp = async function (req: Request, res: Response) {
   const { password, email, name, alias } = req.body;
 
   if (!password || !email || !name || !alias) {
     return res.status(400).json({ msg: "Please send valid data" });
   }
 
-  const userAlias = await users.findOne({ alias });
-  const userEmail = await users.findOne({ email });
+  const userAlias = await USERS.findOne({ alias });
+  const userEmail = await USERS.findOne({ email });
   if (userAlias || userEmail) {
     return res
       .status(400)
@@ -44,7 +41,7 @@ export const signUp = async function (
     return res.status(400).json({ msg: "The email is not valid" });
   }
 
-  const newUser = new users(req.body);
+  const newUser = new USERS(req.body);
   try {
     await newUser.save();
     // console.log("user saved");
@@ -56,7 +53,7 @@ export const signUp = async function (
 
 export const signIn = async function (req: Request, res: Response) {
   const { alias, password } = req.body; //e.g. "ED_123"
-  const user = await users.findOne({ alias });
+  const user = await USERS.findOne({ alias });
 
   if (!alias || !password) {
     return res.status(400).json({ msg: "Please send valid data" });
@@ -80,7 +77,7 @@ export const deleteUser = async function (req: Request, res: Response) {
   const { user } = req.params; //e.g. "ED_123"
   const { password } = req.body;
 
-  const foundUser = await users.findOne({ alias: user });
+  const foundUser = await USERS.findOne({ alias: user });
   if (!password) {
     return res.status(400).json({ msg: "Please send valid data" });
   } else if (!foundUser) {
@@ -89,7 +86,7 @@ export const deleteUser = async function (req: Request, res: Response) {
 
   const isMatch = await foundUser.comparePassword(password);
   if (foundUser && isMatch) {
-    await users.deleteOne({ alias: user });
+    await USERS.deleteOne({ alias: user });
     return res.status(200).json({ msg: "User deleted" });
   }
 
@@ -102,7 +99,7 @@ export const updateName = async function (req: Request, res: Response) {
   const { user } = req.params;
   const { name, oldPass } = req.body;
 
-  const foundUser = await users.findOne({ alias: user });
+  const foundUser = await USERS.findOne({ alias: user });
 
   if (!foundUser) {
     return res.status(400).json({ msg: "User not found" });
@@ -125,12 +122,12 @@ export const updateEmail = async function (req: Request, res: Response) {
   const { user } = req.params;
   const { email, oldPass } = req.body;
 
-  const foundUser = await users.findOne({ alias: user });
+  const foundUser = await USERS.findOne({ alias: user });
   if (!foundUser) {
     return res.status(400).json({ msg: "User not found" });
   }
 
-  const userEmail = await users.findOne({ email: email });
+  const userEmail = await USERS.findOne({ email: email });
   if (userEmail) {
     return res
       .status(400)
@@ -152,28 +149,26 @@ export const updateEmail = async function (req: Request, res: Response) {
     .status(400)
     .json({ msg: "Encountered an error during this process" });
 };
+//   const { user } = req.params;
+//   const { profilePic } = req.body;
 
-export const updateProfilePic = async function (req: Request, res: Response) {
-  const { user } = req.params;
-  const { profilePic } = req.body;
+//   const foundUser = await USERS.findOne({ alias: user });
 
-  const foundUser = await users.findOne({ alias: user });
+//   if (!foundUser) {
+//     return res.status(400).json({ msg: "User not found" });
+//   }
 
-  if (!foundUser) {
-    return res.status(400).json({ msg: "User not found" });
-  }
+//   foundUser.profilePic = profilePic;
+//   await foundUser.save();
 
-  foundUser.profilePic = profilePic;
-  await foundUser.save();
-
-  return res.status(200).json({ msg: "Profile picture updated" });
-};
+//   return res.status(200).json({ msg: "Profile picture updated" });
+// };
 
 export const updatePassword = async function (req: Request, res: Response) {
   const { user } = req.params;
   const { newPass, oldPass } = req.body;
 
-  const foundUser = await users.findOne({ alias: user });
+  const foundUser = await USERS.findOne({ alias: user });
 
   if (!foundUser) {
     return res.status(400).json({ msg: "User not found" });
@@ -196,7 +191,7 @@ export const searchUser = async function (req: Request, res: Response) {
   const { query } = req.body;
 
   try {
-    const user = await users.find({
+    const user = await USERS.find({
       alias: { $regex: query, $options: "i" },
     });
     // const test = user[0].get("lastName");

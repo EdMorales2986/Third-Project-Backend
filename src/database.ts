@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 // Config Mongoose
-mongoose.connect(`${process.env.URI}`, { dbName: "Reviews" });
+mongoose.connect(`${process.env.URI}`, { dbName: "FROM-TMDB" });
 const connection = mongoose.connection;
 
 // Msg: Connection Stablished

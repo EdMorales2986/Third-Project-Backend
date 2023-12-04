@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUser = exports.updatePassword = exports.updateProfilePic = exports.updateEmail = exports.updateName = exports.deleteUser = exports.signIn = exports.signUp = void 0;
+exports.searchUser = exports.updatePassword = exports.updateEmail = exports.updateName = exports.deleteUser = exports.signIn = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const users_1 = __importDefault(require("../models/users"));
 function createToken(user) {
@@ -150,20 +150,16 @@ const updateEmail = function (req, res) {
     });
 };
 exports.updateEmail = updateEmail;
-const updateProfilePic = function (req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { user } = req.params;
-        const { profilePic } = req.body;
-        const foundUser = yield users_1.default.findOne({ alias: user });
-        if (!foundUser) {
-            return res.status(400).json({ msg: "User not found" });
-        }
-        foundUser.profilePic = profilePic;
-        yield foundUser.save();
-        return res.status(200).json({ msg: "Profile picture updated" });
-    });
-};
-exports.updateProfilePic = updateProfilePic;
+//   const { user } = req.params;
+//   const { profilePic } = req.body;
+//   const foundUser = await USERS.findOne({ alias: user });
+//   if (!foundUser) {
+//     return res.status(400).json({ msg: "User not found" });
+//   }
+//   foundUser.profilePic = profilePic;
+//   await foundUser.save();
+//   return res.status(200).json({ msg: "Profile picture updated" });
+// };
 const updatePassword = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { user } = req.params;

@@ -10,6 +10,7 @@ require("dotenv/config");
 const passport_1 = __importDefault(require("passport"));
 const passport_2 = __importDefault(require("./middlewares/passport"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
+const movie_routes_1 = __importDefault(require("./routes/movie.routes"));
 // Init
 const app = (0, express_1.default)();
 // Settings
@@ -23,7 +24,9 @@ app.use(passport_1.default.initialize());
 passport_1.default.use(passport_2.default);
 // Routes
 app.use(user_routes_1.default);
+app.use(movie_routes_1.default);
+// Start
 app.get("/", function (req, res) {
-    res.send(`http://localhost:${app.get("port")}`);
+    res.send(`You should not be here`);
 });
 exports.default = app;

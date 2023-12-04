@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import users, { IUser } from "./users";
+import movies, { IMovie } from "./movies";
 
 export interface IReview extends mongoose.Document {
   movieTitle: string;
@@ -49,4 +50,38 @@ reviewSchema.virtual("ownerType").get(async function () {
   }
 });
 
-export default mongoose.model<IReview>("reviews", reviewSchema);
+reviewSchema.post<IReview>("save", async function () {
+  try {
+    const movie: IMovie | null = await movies
+      .findOne({ title: this.movieTitle })
+      .lean();
+    if (!movie) {
+      return;
+    }
+
+    const type = await this.get("ownerType");
+    switch (type) {
+      case "public":
+        {
+          movie.publicCount++;
+          await movie.save();
+        }
+        break;
+
+      case "critic":
+        {
+          movie.criticsCount++;
+          await movie.save();
+        }
+        break;
+
+      default:
+        console.log(type);
+        break;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export default mongoose.model<IReview>("REVIEWS", reviewSchema);

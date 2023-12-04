@@ -6,6 +6,7 @@ import passport from "passport";
 import passportMiddleWare from "./middlewares/passport";
 
 import userRoutes from "./routes/user.routes";
+import movieRoutes from "./routes/movie.routes";
 
 // Init
 const app = express();
@@ -24,9 +25,11 @@ passport.use(passportMiddleWare);
 
 // Routes
 app.use(userRoutes);
+app.use(movieRoutes);
 
+// Start
 app.get("/", function (req: express.Request, res: express.Response) {
-  res.send(`http://localhost:${app.get("port")}`);
+  res.send(`You should not be here`);
 });
 
 export default app;
