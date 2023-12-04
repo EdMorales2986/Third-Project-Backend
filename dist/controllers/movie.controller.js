@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.filterByGenre = exports.filterByYear = exports.searchMovie = void 0;
+exports.oldestFirst = exports.newestFirst = exports.filterByDuration = exports.filterByGenre = exports.filterByYear = exports.searchMovie = void 0;
 const movies_1 = __importDefault(require("../models/movies"));
 const moviedb_promise_1 = require("moviedb-promise");
 const TMDB = new moviedb_promise_1.MovieDb(`${process.env.APIKEY}`);
@@ -44,7 +44,12 @@ const createEntries = function (movies) {
             }).then((data) => {
                 var _a;
                 const trailer = (_a = data.results) === null || _a === void 0 ? void 0 : _a.find((element) => element.type === "Trailer");
-                entry.trailerURL = `https://www.youtube.com/watch?v=${trailer === null || trailer === void 0 ? void 0 : trailer.key}`;
+                if (!trailer) {
+                    entry.trailerURL = "not available";
+                }
+                else {
+                    entry.trailerURL = `https://www.youtube.com/watch?v=${trailer === null || trailer === void 0 ? void 0 : trailer.key}`;
+                }
             });
             yield entry.save();
         }
@@ -135,3 +140,51 @@ const filterByGenre = function (req, res) {
     });
 };
 exports.filterByGenre = filterByGenre;
+const filterByDuration = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { duration } = req.params;
+            const movies = yield movies_1.default.find({
+                duration: { $lte: duration },
+            }).lean();
+            if (!movies || movies.length === 0) {
+                return res.status(400).json({ msg: "Movies not found" });
+            }
+            return res.status(200).json(movies);
+        }
+        catch (err) {
+            return res.status(400).json(err);
+        }
+    });
+};
+exports.filterByDuration = filterByDuration;
+const newestFirst = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const movies = yield movies_1.default.find().sort({ releaseDate: -1 }).lean();
+            if (!movies || movies.length === 0) {
+                return res.status(400).json({ msg: "Movies not found" });
+            }
+            return res.status(200).json(movies);
+        }
+        catch (err) {
+            return res.status(400).json(err);
+        }
+    });
+};
+exports.newestFirst = newestFirst;
+const oldestFirst = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const movies = yield movies_1.default.find().sort({ releaseDate: 1 }).lean();
+            if (!movies || movies.length === 0) {
+                return res.status(400).json({ msg: "Movies not found" });
+            }
+            return res.status(200).json(movies);
+        }
+        catch (err) {
+            return res.status(400).json(err);
+        }
+    });
+};
+exports.oldestFirst = oldestFirst;

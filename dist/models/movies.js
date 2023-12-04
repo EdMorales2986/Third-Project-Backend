@@ -37,22 +37,9 @@ const movieSchema = new mongoose_1.default.Schema({
         type: Number,
         default: 0,
     },
-    publicCount: {
-        type: Number,
-        default: 0,
-    },
     criticsRatings: {
         type: Number,
         default: 0,
     },
-    criticsCount: {
-        type: Number,
-        default: 0,
-    },
-    // status: {
-    //   type: String,
-    //   enum: ["Released"],
-    //   required: true,
-    // },
 });
 exports.default = mongoose_1.default.model("MOVIES", movieSchema);

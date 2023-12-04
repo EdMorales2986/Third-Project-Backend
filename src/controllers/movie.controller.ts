@@ -37,7 +37,11 @@ const createEntries = async function (movies: MovieResult[]) {
       const trailer = data.results?.find(
         (element: any) => element.type === "Trailer"
       );
-      entry.trailerURL = `https://www.youtube.com/watch?v=${trailer?.key}`;
+      if (!trailer) {
+        entry.trailerURL = "not available";
+      } else {
+        entry.trailerURL = `https://www.youtube.com/watch?v=${trailer?.key}`;
+      }
     });
     await entry.save();
   }
@@ -120,6 +124,51 @@ export const filterByGenre = async function (req: Request, res: Response) {
     const movies = await MOVIES.find({
       genres: { $in: `${genre}` },
     }).lean();
+
+    if (!movies || movies.length === 0) {
+      return res.status(400).json({ msg: "Movies not found" });
+    }
+
+    return res.status(200).json(movies);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+
+export const filterByDuration = async function (req: Request, res: Response) {
+  try {
+    const { duration } = req.params;
+    const movies = await MOVIES.find({
+      duration: { $lte: duration },
+    }).lean();
+
+    if (!movies || movies.length === 0) {
+      return res.status(400).json({ msg: "Movies not found" });
+    }
+
+    return res.status(200).json(movies);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+
+export const newestFirst = async function (req: Request, res: Response) {
+  try {
+    const movies = await MOVIES.find().sort({ releaseDate: -1 }).lean();
+
+    if (!movies || movies.length === 0) {
+      return res.status(400).json({ msg: "Movies not found" });
+    }
+
+    return res.status(200).json(movies);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+
+export const oldestFirst = async function (req: Request, res: Response) {
+  try {
+    const movies = await MOVIES.find().sort({ releaseDate: 1 }).lean();
 
     if (!movies || movies.length === 0) {
       return res.status(400).json({ msg: "Movies not found" });

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import users, { IUser } from "./users";
-import movies, { IMovie } from "./movies";
+import USERS, { IUser } from "./users";
+import MOVIES, { IMovie } from "./movies";
 
 export interface IReview extends mongoose.Document {
   movieTitle: string;
@@ -21,67 +21,24 @@ const reviewSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      min: 0,
+      min: 1,
       max: 5,
+      default: 1,
       required: true,
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: true,
-      ref: "User",
+    },
+    type: {
+      type: String,
+      enum: ["public", "critic"],
+      required: true,
     },
   },
   {
     timestamps: true,
   }
 );
-
-reviewSchema.virtual("ownerType").get(async function () {
-  try {
-    const user: IUser | null = await users
-      .findOne({ alias: this.owner })
-      .lean();
-    if (!user) {
-      return null;
-    }
-    return user.type;
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-reviewSchema.post<IReview>("save", async function () {
-  try {
-    const movie: IMovie | null = await movies
-      .findOne({ title: this.movieTitle })
-      .lean();
-    if (!movie) {
-      return;
-    }
-
-    const type = await this.get("ownerType");
-    switch (type) {
-      case "public":
-        {
-          movie.publicCount++;
-          await movie.save();
-        }
-        break;
-
-      case "critic":
-        {
-          movie.criticsCount++;
-          await movie.save();
-        }
-        break;
-
-      default:
-        console.log(type);
-        break;
-    }
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 export default mongoose.model<IReview>("REVIEWS", reviewSchema);

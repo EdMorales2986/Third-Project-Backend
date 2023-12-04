@@ -7,6 +7,8 @@ import passportMiddleWare from "./middlewares/passport";
 
 import userRoutes from "./routes/user.routes";
 import movieRoutes from "./routes/movie.routes";
+import reviewRoutes from "./routes/review.routes";
+import commnentRoutes from "./routes/comment.routes";
 
 // Init
 const app = express();
@@ -26,6 +28,8 @@ passport.use(passportMiddleWare);
 // Routes
 app.use(userRoutes);
 app.use(movieRoutes);
+app.use(reviewRoutes);
+app.use(commnentRoutes);
 
 // Start
 app.get("/", function (req: express.Request, res: express.Response) {

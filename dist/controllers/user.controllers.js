@@ -15,8 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchUser = exports.updatePassword = exports.updateEmail = exports.updateName = exports.deleteUser = exports.signIn = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const users_1 = __importDefault(require("../models/users"));
+const reviews_1 = __importDefault(require("../models/reviews"));
+const movies_1 = __importDefault(require("../models/movies"));
+const reviews_controller_1 = require("./reviews.controller");
 function createToken(user) {
-    return jsonwebtoken_1.default.sign({ id: user.id, alias: user.alias }, `${process.env.JWTSECRET}`, { expiresIn: "10000" });
+    return jsonwebtoken_1.default.sign({ alias: user.alias, password: user.password }, `${process.env.JWTSECRET}`, { expiresIn: "10000" });
 }
 function validateEmail(email) {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -62,7 +65,7 @@ const signUp = function (req, res) {
 exports.signUp = signUp;
 const signIn = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { alias, password } = req.body; //e.g. "ED_123"
+        const { alias, password } = req.body; //e.g. "ED_123" "bruh12345"
         const user = yield users_1.default.findOne({ alias });
         if (!alias || !password) {
             return res.status(400).json({ msg: "Please send valid data" });
@@ -93,6 +96,14 @@ const deleteUser = function (req, res) {
         const isMatch = yield foundUser.comparePassword(password);
         if (foundUser && isMatch) {
             yield users_1.default.deleteOne({ alias: user });
+            const reviews = yield reviews_1.default.find({ owner: user });
+            for (const review of reviews) {
+                yield reviews_1.default.deleteOne({ _id: review._id });
+                const movie = yield movies_1.default.findOne({ title: review.movieTitle });
+                if (movie) {
+                    yield (0, reviews_controller_1.movieUtil)(movie);
+                }
+            }
             return res.status(200).json({ msg: "User deleted" });
         }
         return res

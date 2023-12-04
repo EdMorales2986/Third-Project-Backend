@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import USERS, { IUser } from "../models/users";
+import REVIEWS, { IReview } from "../models/reviews";
+import MOVIES, { IMovie } from "../models/movies";
+import { movieUtil } from "./reviews.controller";
 
 function createToken(user: IUser) {
   return jwt.sign(
-    { id: user.id, alias: user.alias },
+    { alias: user.alias, password: user.password },
     `${process.env.JWTSECRET}`,
     { expiresIn: "10000" }
   );
@@ -52,7 +55,7 @@ export const signUp = async function (req: Request, res: Response) {
 };
 
 export const signIn = async function (req: Request, res: Response) {
-  const { alias, password } = req.body; //e.g. "ED_123"
+  const { alias, password } = req.body; //e.g. "ED_123" "bruh12345"
   const user = await USERS.findOne({ alias });
 
   if (!alias || !password) {
@@ -87,6 +90,16 @@ export const deleteUser = async function (req: Request, res: Response) {
   const isMatch = await foundUser.comparePassword(password);
   if (foundUser && isMatch) {
     await USERS.deleteOne({ alias: user });
+
+    const reviews = await REVIEWS.find({ owner: user });
+    for (const review of reviews) {
+      await REVIEWS.deleteOne({ _id: review._id });
+      const movie = await MOVIES.findOne({ title: review.movieTitle });
+      if (movie) {
+        await movieUtil(movie);
+      }
+    }
+
     return res.status(200).json({ msg: "User deleted" });
   }
 

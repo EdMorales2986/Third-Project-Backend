@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import REVIEWS, { IReview } from "../models/reviews";
 
 export interface IMovie extends mongoose.Document {
   title: string;
@@ -10,10 +9,7 @@ export interface IMovie extends mongoose.Document {
   trailerURL: string;
   duration: number;
   publicRatings: number;
-  publicCount: number;
   criticsRatings: number;
-  criticsCount: number;
-  status: string;
 }
 
 const movieSchema = new mongoose.Schema({
@@ -49,23 +45,10 @@ const movieSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  publicCount: {
-    type: Number,
-    default: 0,
-  },
   criticsRatings: {
     type: Number,
     default: 0,
   },
-  criticsCount: {
-    type: Number,
-    default: 0,
-  },
-  // status: {
-  //   type: String,
-  //   enum: ["Released"],
-  //   required: true,
-  // },
 });
 
 export default mongoose.model<IMovie>("MOVIES", movieSchema);
