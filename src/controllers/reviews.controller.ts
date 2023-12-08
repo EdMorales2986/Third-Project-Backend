@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import MOVIES, { IMovie } from "../models/movies";
+import SERIES, { ISerie } from "../models/series";
 import REVIEWS, { IReview } from "../models/reviews";
 import USERS, { IUser } from "../models/users";
 
 export const movieUtil = async function (movie: IMovie) {
   const publicUtil = await REVIEWS.find({
-    movieTitle: movie.title,
+    mediaTitle: movie.title,
     type: "public",
   }).lean();
 
@@ -22,7 +23,7 @@ export const movieUtil = async function (movie: IMovie) {
   }
 
   const criticUtil = await REVIEWS.find({
-    movieTitle: movie.title,
+    mediaTitle: movie.title,
     type: "critic",
   }).lean();
 
@@ -40,13 +41,57 @@ export const movieUtil = async function (movie: IMovie) {
   await movie.save();
 };
 
+export const serieUtil = async function (serie: ISerie) {
+  const publicUtil = await REVIEWS.find({
+    mediaTitle: serie.title,
+    type: "public",
+  }).lean();
+
+  // console.log(publicUtil);
+
+  if (!publicUtil || publicUtil.length === 0) {
+    serie.publicRatings = 0;
+  } else {
+    const publicCount = publicUtil.length;
+    const totalPublic = publicUtil.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    serie.publicRatings = totalPublic / publicCount;
+  }
+
+  const criticUtil = await REVIEWS.find({
+    mediaTitle: serie.title,
+    type: "critic",
+  }).lean();
+
+  if (!criticUtil || criticUtil.length === 0) {
+    serie.criticsRatings = 0;
+  } else {
+    const criticCount = criticUtil.length;
+    const totalCritic = criticUtil.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    serie.criticsRatings = totalCritic / criticCount;
+  }
+
+  await serie.save();
+};
+
 export const createReview = async function (req: Request, res: Response) {
   const { owner } = req.params;
-  const { movieTitle, description, rating } = req.body;
+  const { mediaTitle, description, rating } = req.body;
+
+  if (!mediaTitle || !owner || !description || !rating) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
 
   const verify = await REVIEWS.findOne({
     owner: owner,
-    movieTitle: movieTitle,
+    mediaTitle: mediaTitle,
   });
 
   if (verify) {
@@ -56,14 +101,11 @@ export const createReview = async function (req: Request, res: Response) {
   }
 
   try {
-    if (!movieTitle || !owner || !description || !rating) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
-    }
-
     const movie = await MOVIES.findOne({
-      title: movieTitle,
+      title: mediaTitle,
+    });
+    const serie = await SERIES.findOne({
+      title: mediaTitle,
     });
     const user = await USERS.findOne({
       alias: owner,
@@ -73,24 +115,36 @@ export const createReview = async function (req: Request, res: Response) {
         message: "User not found",
       });
     }
-    if (!movie) {
-      return res.status(404).json({
-        message: "Movie not found",
+
+    if (movie) {
+      const newReview = new REVIEWS({
+        mediaTitle: mediaTitle,
+        description: description,
+        rating: rating,
+        owner: owner,
+        type: user.type,
       });
+      await newReview.save();
+      await movieUtil(movie);
+      return res.status(201).json({ msg: "Review created" });
     }
 
-    const newReview = new REVIEWS({
-      movieTitle: movieTitle,
-      description: description,
-      rating: rating,
-      owner: owner,
-      type: user.type,
+    if (serie) {
+      const newReview = new REVIEWS({
+        mediaTitle: mediaTitle,
+        description: description,
+        rating: rating,
+        owner: owner,
+        type: user.type,
+      });
+      await newReview.save();
+      await serieUtil(serie);
+      return res.status(201).json({ msg: "Review created" });
+    }
+
+    return res.status(400).json({
+      message: "Media not found",
     });
-
-    await newReview.save();
-    await movieUtil(movie);
-
-    return res.status(201).json({ msg: "Review created" });
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -98,21 +152,24 @@ export const createReview = async function (req: Request, res: Response) {
 
 export const editReview = async function (req: Request, res: Response) {
   const { owner } = req.params;
-  const { movieTitle, description, rating } = req.body;
+  const { mediaTitle, description, rating } = req.body;
 
   try {
-    if (!movieTitle || !owner || !description || !rating) {
+    if (!mediaTitle || !owner || !description || !rating) {
       return res.status(400).json({
         message: "All fields are required",
       });
     }
 
     const movie = await MOVIES.findOne({
-      title: movieTitle,
+      title: mediaTitle,
+    });
+    const serie = await SERIES.findOne({
+      title: mediaTitle,
     });
     const review = await REVIEWS.findOne({
       owner: owner,
-      movieTitle: movieTitle,
+      mediaTitle: mediaTitle,
     });
 
     if (!review) {
@@ -120,19 +177,31 @@ export const editReview = async function (req: Request, res: Response) {
         message: "Review not found",
       });
     }
-    if (!movie) {
-      return res.status(404).json({
-        message: "Movie not found",
+    if (movie) {
+      review.description = description;
+      review.rating = rating;
+
+      await review.save();
+      await movieUtil(movie);
+      return res.status(400).json({
+        message: "Review updated",
       });
     }
 
-    review.description = description;
-    review.rating = rating;
+    if (serie) {
+      review.description = description;
+      review.rating = rating;
 
-    await review.save();
-    await movieUtil(movie);
+      await review.save();
+      await serieUtil(serie);
+      return res.status(400).json({
+        message: "Review updated",
+      });
+    }
 
-    return res.status(200).json({ msg: "Review updated" });
+    return res.status(400).json({
+      message: "Media not found",
+    });
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -140,21 +209,24 @@ export const editReview = async function (req: Request, res: Response) {
 
 export const deleteReview = async function (req: Request, res: Response) {
   const { owner } = req.params;
-  const { movieTitle } = req.body;
+  const { mediaTitle } = req.body;
 
   try {
-    if (!movieTitle || !owner) {
+    if (!mediaTitle || !owner) {
       return res.status(400).json({
         message: "All fields are required",
       });
     }
 
     const movie = await MOVIES.findOne({
-      title: movieTitle,
+      title: mediaTitle,
+    });
+    const serie = await SERIES.findOne({
+      title: mediaTitle,
     });
     const review = await REVIEWS.findOne({
       owner: owner,
-      movieTitle: movieTitle,
+      mediaTitle: mediaTitle,
     });
 
     if (!review) {
@@ -162,19 +234,30 @@ export const deleteReview = async function (req: Request, res: Response) {
         message: "Review not found",
       });
     }
-    if (!movie) {
-      return res.status(404).json({
-        message: "Movie not found",
+
+    if (movie) {
+      await REVIEWS.deleteOne({
+        owner: owner,
+        mediaTitle: mediaTitle,
       });
+      await movieUtil(movie);
+
+      return res.status(200).json({ msg: "Review deleted" });
     }
 
-    await REVIEWS.deleteOne({
-      owner: owner,
-      movieTitle: movieTitle,
-    });
-    await movieUtil(movie);
+    if (serie) {
+      await REVIEWS.deleteOne({
+        owner: owner,
+        mediaTitle: mediaTitle,
+      });
+      await serieUtil(serie);
 
-    return res.status(200).json({ msg: "Review deleted" });
+      return res.status(200).json({ msg: "Review deleted" });
+    }
+
+    return res.status(400).json({
+      message: "Media not found",
+    });
   } catch (err) {
     return res.status(500).json(err);
   }

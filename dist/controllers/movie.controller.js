@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.oldestFirst = exports.newestFirst = exports.filterByDuration = exports.filterByGenre = exports.filterByYear = exports.searchMovie = void 0;
+exports.getMovies = exports.oldestFirst = exports.newestFirst = exports.filterByDuration = exports.filterByGenre = exports.filterByYear = exports.searchMovie = void 0;
 const movies_1 = __importDefault(require("../models/movies"));
 const moviedb_promise_1 = require("moviedb-promise");
 const TMDB = new moviedb_promise_1.MovieDb(`${process.env.APIKEY}`);
@@ -26,7 +26,9 @@ const createEntries = function (movies) {
             });
             if (!movieInfo.release_date ||
                 !movieInfo.overview ||
-                movieInfo.status !== "Released") {
+                movieInfo.status !== "Released" ||
+                (movieInfo.original_language !== "en" &&
+                    movieInfo.original_language !== "es")) {
                 continue;
             }
             const entry = new movies_1.default({
@@ -69,6 +71,7 @@ const createEntries = function (movies) {
 //   }
 // };
 const searchMovie = function (req, res) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { query } = req.body;
@@ -80,7 +83,7 @@ const searchMovie = function (req, res) {
                     query: `${query}`,
                     language: "en",
                 });
-                if (!movieQuery) {
+                if (!movieQuery || ((_a = movieQuery.results) === null || _a === void 0 ? void 0 : _a.length) === 0) {
                     return res.status(400).json({ msg: "Movie not found" });
                 }
                 const movies = movieQuery.results;
@@ -125,9 +128,9 @@ exports.filterByYear = filterByYear;
 const filterByGenre = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { genre } = req.params;
+            const { genre } = req.body;
             const movies = yield movies_1.default.find({
-                genres: { $in: `${genre}` },
+                genres: { $in: genre },
             }).lean();
             if (!movies || movies.length === 0) {
                 return res.status(400).json({ msg: "Movies not found" });
@@ -188,3 +191,18 @@ const oldestFirst = function (req, res) {
     });
 };
 exports.oldestFirst = oldestFirst;
+const getMovies = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const movies = yield movies_1.default.find().lean();
+            if (!movies || movies.length === 0) {
+                return res.status(400).json({ msg: "Movies not found" });
+            }
+            return res.status(200).json(movies);
+        }
+        catch (err) {
+            return res.status(400).json(err);
+        }
+    });
+};
+exports.getMovies = getMovies;

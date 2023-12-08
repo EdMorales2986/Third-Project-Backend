@@ -36,7 +36,7 @@ export const deleteComment = async function (req: Request, res: Response) {
     return res.status(400).json({ msg: "Please send valid data" });
   }
   try {
-    const comment = await COMMENTS.findOne({ _id: id });
+    const comment = await COMMENTS.findOne({ _id: id, owner: owner });
     if (comment?.owner !== owner || !comment) {
       return res
         .status(400)

@@ -13,6 +13,7 @@ const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const movie_routes_1 = __importDefault(require("./routes/movie.routes"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
 const comment_routes_1 = __importDefault(require("./routes/comment.routes"));
+const serie_routes_1 = __importDefault(require("./routes/serie.routes"));
 // Init
 const app = (0, express_1.default)();
 // Settings
@@ -29,6 +30,7 @@ app.use(user_routes_1.default);
 app.use(movie_routes_1.default);
 app.use(review_routes_1.default);
 app.use(comment_routes_1.default);
+app.use(serie_routes_1.default);
 // Start
 app.get("/", function (req, res) {
     res.send(`You should not be here`);

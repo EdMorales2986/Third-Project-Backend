@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
 import MOVIES, { IMovie } from "../models/movies";
 import { MovieDb, MovieResult } from "moviedb-promise";
 
@@ -15,7 +14,9 @@ const createEntries = async function (movies: MovieResult[]) {
     if (
       !movieInfo.release_date ||
       !movieInfo.overview ||
-      movieInfo.status !== "Released"
+      movieInfo.status !== "Released" ||
+      (movieInfo.original_language !== "en" &&
+        movieInfo.original_language !== "es")
     ) {
       continue;
     }
@@ -76,7 +77,7 @@ export const searchMovie = async function (req: Request, res: Response) {
         language: "en",
       });
 
-      if (!movieQuery) {
+      if (!movieQuery || movieQuery.results?.length === 0) {
         return res.status(400).json({ msg: "Movie not found" });
       }
 
@@ -86,6 +87,7 @@ export const searchMovie = async function (req: Request, res: Response) {
       const response = await MOVIES.find({
         title: { $regex: `${query}`, $options: "i" },
       }).lean();
+
       if (!response || response.length === 0) {
         return res.status(400).json({ msg: "Movie not found" });
       }
@@ -120,9 +122,9 @@ export const filterByYear = async function (req: Request, res: Response) {
 
 export const filterByGenre = async function (req: Request, res: Response) {
   try {
-    const { genre } = req.params;
+    const { genre } = req.body;
     const movies = await MOVIES.find({
-      genres: { $in: `${genre}` },
+      genres: { $in: genre },
     }).lean();
 
     if (!movies || movies.length === 0) {
@@ -169,6 +171,20 @@ export const newestFirst = async function (req: Request, res: Response) {
 export const oldestFirst = async function (req: Request, res: Response) {
   try {
     const movies = await MOVIES.find().sort({ releaseDate: 1 }).lean();
+
+    if (!movies || movies.length === 0) {
+      return res.status(400).json({ msg: "Movies not found" });
+    }
+
+    return res.status(200).json(movies);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+
+export const getMovies = async function (req: Request, res: Response) {
+  try {
+    const movies = await MOVIES.find().lean();
 
     if (!movies || movies.length === 0) {
       return res.status(400).json({ msg: "Movies not found" });

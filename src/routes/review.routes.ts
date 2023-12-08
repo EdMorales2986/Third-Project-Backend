@@ -7,8 +7,9 @@ import {
 
 const router = Router();
 
-router.post("/reviews/movie/:owner", createReview);
-router.delete("/reviews/movie/:owner", deleteReview);
-router.put("/reviews/movie/:owner", editReview);
+// owner must be like PIPO123
+router.post("/reviews/:owner", createReview);
+router.delete("/reviews/:owner", deleteReview);
+router.put("/reviews/:owner", editReview);
 
 export default router;

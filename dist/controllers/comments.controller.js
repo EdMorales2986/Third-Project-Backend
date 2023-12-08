@@ -49,7 +49,7 @@ const deleteComment = function (req, res) {
             return res.status(400).json({ msg: "Please send valid data" });
         }
         try {
-            const comment = yield comments_1.default.findOne({ _id: id });
+            const comment = yield comments_1.default.findOne({ _id: id, owner: owner });
             if ((comment === null || comment === void 0 ? void 0 : comment.owner) !== owner || !comment) {
                 return res
                     .status(400)

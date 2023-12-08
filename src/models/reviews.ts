@@ -11,7 +11,7 @@ export interface IReview extends mongoose.Document {
 
 const reviewSchema = new mongoose.Schema(
   {
-    movieTitle: {
+    mediaTitle: {
       type: String,
       required: true,
     },

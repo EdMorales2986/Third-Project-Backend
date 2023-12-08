@@ -9,6 +9,7 @@ import userRoutes from "./routes/user.routes";
 import movieRoutes from "./routes/movie.routes";
 import reviewRoutes from "./routes/review.routes";
 import commnentRoutes from "./routes/comment.routes";
+import serieRoutes from "./routes/serie.routes";
 
 // Init
 const app = express();
@@ -30,6 +31,7 @@ app.use(userRoutes);
 app.use(movieRoutes);
 app.use(reviewRoutes);
 app.use(commnentRoutes);
+app.use(serieRoutes);
 
 // Start
 app.get("/", function (req: express.Request, res: express.Response) {
