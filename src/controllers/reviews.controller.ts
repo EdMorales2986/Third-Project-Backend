@@ -262,3 +262,95 @@ export const deleteReview = async function (req: Request, res: Response) {
     return res.status(500).json(err);
   }
 };
+
+export const getReviews = async function (req: Request, res: Response) {
+  const { mediaTitle } = req.body;
+  try {
+    if (!mediaTitle) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const movie = await MOVIES.findOne({
+      title: mediaTitle,
+    }).lean();
+    const serie = await SERIES.findOne({
+      title: mediaTitle,
+    }).lean();
+    if (!movie && !serie) {
+      return res.status(400).json({
+        message: "Media not found",
+      });
+    }
+
+    const reviews = await REVIEWS.find({
+      mediaTitle: mediaTitle,
+    }).lean();
+    return res.status(200).json(reviews);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const getPublicReviews = async function (req: Request, res: Response) {
+  const { mediaTitle } = req.body;
+  try {
+    if (!mediaTitle) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const movie = await MOVIES.findOne({
+      title: mediaTitle,
+    }).lean();
+    const serie = await SERIES.findOne({
+      title: mediaTitle,
+    }).lean();
+    if (!movie && !serie) {
+      return res.status(400).json({
+        message: "Media not found",
+      });
+    }
+
+    const reviews = await REVIEWS.find({
+      mediaTitle: mediaTitle,
+      type: "public",
+    }).lean();
+    return res.status(200).json(reviews);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const getCriticReviews = async function (req: Request, res: Response) {
+  const { mediaTitle } = req.body;
+  try {
+    if (!mediaTitle) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const movie = await MOVIES.findOne({
+      title: mediaTitle,
+    }).lean();
+    const serie = await SERIES.findOne({
+      title: mediaTitle,
+    }).lean();
+    if (!movie && !serie) {
+      return res.status(400).json({
+        message: "Media not found",
+      });
+    }
+
+    const reviews = await REVIEWS.find({
+      mediaTitle: mediaTitle,
+      type: "critic",
+    }).lean();
+    return res.status(200).json(reviews);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

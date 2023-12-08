@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteReview = exports.editReview = exports.createReview = exports.serieUtil = exports.movieUtil = void 0;
+exports.getCriticReviews = exports.getPublicReviews = exports.getReviews = exports.deleteReview = exports.editReview = exports.createReview = exports.serieUtil = exports.movieUtil = void 0;
 const movies_1 = __importDefault(require("../models/movies"));
 const series_1 = __importDefault(require("../models/series"));
 const reviews_1 = __importDefault(require("../models/reviews"));
@@ -249,3 +249,98 @@ const deleteReview = function (req, res) {
     });
 };
 exports.deleteReview = deleteReview;
+const getReviews = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { mediaTitle } = req.body;
+        try {
+            if (!mediaTitle) {
+                return res.status(400).json({
+                    message: "All fields are required",
+                });
+            }
+            const movie = yield movies_1.default.findOne({
+                title: mediaTitle,
+            }).lean();
+            const serie = yield series_1.default.findOne({
+                title: mediaTitle,
+            }).lean();
+            if (!movie && !serie) {
+                return res.status(400).json({
+                    message: "Media not found",
+                });
+            }
+            const reviews = yield reviews_1.default.find({
+                mediaTitle: mediaTitle,
+            }).lean();
+            return res.status(200).json(reviews);
+        }
+        catch (err) {
+            return res.status(500).json(err);
+        }
+    });
+};
+exports.getReviews = getReviews;
+const getPublicReviews = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { mediaTitle } = req.body;
+        try {
+            if (!mediaTitle) {
+                return res.status(400).json({
+                    message: "All fields are required",
+                });
+            }
+            const movie = yield movies_1.default.findOne({
+                title: mediaTitle,
+            }).lean();
+            const serie = yield series_1.default.findOne({
+                title: mediaTitle,
+            }).lean();
+            if (!movie && !serie) {
+                return res.status(400).json({
+                    message: "Media not found",
+                });
+            }
+            const reviews = yield reviews_1.default.find({
+                mediaTitle: mediaTitle,
+                type: "public",
+            }).lean();
+            return res.status(200).json(reviews);
+        }
+        catch (err) {
+            return res.status(500).json(err);
+        }
+    });
+};
+exports.getPublicReviews = getPublicReviews;
+const getCriticReviews = function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { mediaTitle } = req.body;
+        try {
+            if (!mediaTitle) {
+                return res.status(400).json({
+                    message: "All fields are required",
+                });
+            }
+            const movie = yield movies_1.default.findOne({
+                title: mediaTitle,
+            }).lean();
+            const serie = yield series_1.default.findOne({
+                title: mediaTitle,
+            }).lean();
+            if (!movie && !serie) {
+                return res.status(400).json({
+                    message: "Media not found",
+                });
+            }
+            const reviews = yield reviews_1.default.find({
+                mediaTitle: mediaTitle,
+                type: "critic",
+            }).lean();
+            return res.status(200).json(reviews);
+        }
+        catch (err) {
+            return res.status(500).json(err);
+        }
+    });
+};
+exports.getCriticReviews = getCriticReviews;
