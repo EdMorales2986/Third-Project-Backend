@@ -18,16 +18,14 @@ const chatSchema = new mongoose_1.default.Schema({
     roomId: {
         type: String,
         required: true,
+        unique: true,
     },
     messages: {
         type: [messageSchema],
         required: true,
     },
-    participant1: {
-        type: String,
-    },
-    participant2: {
-        type: String,
+    participants: {
+        type: [String],
     },
     type: {
         type: String,

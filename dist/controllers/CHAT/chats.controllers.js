@@ -12,17 +12,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMessage = exports.getMessages = exports.getPrivateChats = exports.getPublicChats = exports.createChat = void 0;
+exports.sendMessage = exports.getMessages = exports.getPrivateChats = exports.getPublicChats = exports.privateChats = void 0;
 const chats_1 = __importDefault(require("../../models/CHAT/chats"));
-const createChat = function (req, res) {
+const privateChats = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { roomId, participant1, participant2 } = req.body;
+        const { roomId, participants } = req.body;
         if (!roomId) {
             return res.status(400).json({ msg: "Please send valid data" });
         }
+        try {
+            const chat = yield chats_1.default.findOne({
+                participants: { $all: participants },
+            });
+            if (chat) {
+                return res
+                    .status(200)
+                    .json({ msg: "Chat already exists", roomId: chat.roomId });
+            }
+            const newChat = new chats_1.default({
+                roomId: roomId,
+                messages: [],
+                participants: participants,
+                type: "private",
+            });
+            yield newChat.save();
+            return res
+                .status(200)
+                .json({ msg: "Chat created", roomId: newChat.roomId });
+        }
+        catch (error) {
+            return res.status(500).json({ msg: "Error creating chat" });
+        }
     });
 };
-exports.createChat = createChat;
+exports.privateChats = privateChats;
 const getPublicChats = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield chats_1.default.find({ type: "public" });
@@ -39,7 +62,7 @@ const getPrivateChats = function (req, res) {
 exports.getPrivateChats = getPrivateChats;
 const getMessages = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { roomId } = req.body;
+        const { roomId } = req.params;
         if (!roomId) {
             return res.status(400).json({ msg: "Please send valid data" });
         }

@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 interface IMessage {
-  roomId: string;
   message: string;
   sender: string;
 }
@@ -9,8 +8,7 @@ interface IMessage {
 export interface IChat extends mongoose.Document {
   roomId: string;
   messages: string[];
-  participant1: string;
-  participant2: string;
+  participants: string[];
   type: string;
 }
 
@@ -29,16 +27,14 @@ const chatSchema = new mongoose.Schema({
   roomId: {
     type: String,
     required: true,
+    unique: true,
   },
   messages: {
     type: [messageSchema],
     required: true,
   },
-  participant1: {
-    type: String,
-  },
-  participant2: {
-    type: String,
+  participants: {
+    type: [String],
   },
   type: {
     type: String,
