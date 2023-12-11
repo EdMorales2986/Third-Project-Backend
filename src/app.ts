@@ -10,6 +10,7 @@ import movieRoutes from "./routes/movie.routes";
 import reviewRoutes from "./routes/review.routes";
 import commnentRoutes from "./routes/comment.routes";
 import serieRoutes from "./routes/serie.routes";
+import chatRoutes from "./routes/CHAT/chat.routes";
 
 // Init
 const app = express();
@@ -32,10 +33,6 @@ app.use(movieRoutes);
 app.use(reviewRoutes);
 app.use(commnentRoutes);
 app.use(serieRoutes);
-
-// Start
-app.get("/", function (req: express.Request, res: express.Response) {
-  res.send(`You should not be here`);
-});
+app.use(chatRoutes);
 
 export default app;

@@ -4,5 +4,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
-const chatSchema = new mongoose_1.default.Schema({});
+const messageSchema = new mongoose_1.default.Schema({
+    message: {
+        type: String,
+        required: true,
+    },
+    sender: {
+        type: String,
+        required: true,
+    },
+});
+const chatSchema = new mongoose_1.default.Schema({
+    roomId: {
+        type: String,
+        required: true,
+    },
+    messages: {
+        type: [messageSchema],
+        required: true,
+    },
+    participant1: {
+        type: String,
+    },
+    participant2: {
+        type: String,
+    },
+    type: {
+        type: String,
+        required: true,
+        enum: ["private", "public"],
+    },
+});
 exports.default = mongoose_1.default.model("CHATS", chatSchema);
