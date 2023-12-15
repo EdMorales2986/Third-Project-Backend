@@ -41,7 +41,7 @@ const createEntries = async function (movies: MovieResult[]) {
       if (!trailer) {
         entry.trailerURL = "not available";
       } else {
-        entry.trailerURL = `https://www.youtube.com/watch?v=${trailer?.key}`;
+        entry.trailerURL = `https://www.youtube.com/embed/${trailer?.key}`;
       }
     });
     await entry.save();

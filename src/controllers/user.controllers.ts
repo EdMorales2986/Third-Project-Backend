@@ -9,7 +9,7 @@ function createToken(user: IUser) {
   return jwt.sign(
     { alias: user.alias, password: user.password },
     `${process.env.JWTSECRET}`,
-    { expiresIn: "10000" }
+    { expiresIn: "7d" }
   );
 }
 
@@ -77,8 +77,7 @@ export const signIn = async function (req: Request, res: Response) {
 };
 
 export const deleteUser = async function (req: Request, res: Response) {
-  const { user } = req.params; //e.g. "ED_123"
-  const { password } = req.body;
+  const { user, password } = req.params; //e.g. "ED_123"
 
   const foundUser = await USERS.findOne({ alias: user });
   if (!password) {

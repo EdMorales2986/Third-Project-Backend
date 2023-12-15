@@ -12,7 +12,7 @@ const router = Router();
 
 // owner must be like PIPO123
 router.post("/reviews/:owner", createReview);
-router.delete("/reviews/:owner", deleteReview);
+router.delete("/reviews/:owner/:mediaTitle", deleteReview);
 router.put("/reviews/:owner", editReview);
 router.post("/all/reviews", getReviews);
 router.post("/public/reviews", getPublicReviews);

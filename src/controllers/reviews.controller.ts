@@ -209,7 +209,8 @@ export const editReview = async function (req: Request, res: Response) {
 
 export const deleteReview = async function (req: Request, res: Response) {
   const { owner } = req.params;
-  const { mediaTitle } = req.body;
+  const mediaTitle = decodeURI(req.params.mediaTitle);
+  // console.log(mediaTitle);
 
   try {
     if (!mediaTitle || !owner) {

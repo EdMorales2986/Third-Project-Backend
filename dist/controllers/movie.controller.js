@@ -50,7 +50,7 @@ const createEntries = function (movies) {
                     entry.trailerURL = "not available";
                 }
                 else {
-                    entry.trailerURL = `https://www.youtube.com/watch?v=${trailer === null || trailer === void 0 ? void 0 : trailer.key}`;
+                    entry.trailerURL = `https://www.youtube.com/embed/${trailer === null || trailer === void 0 ? void 0 : trailer.key}`;
                 }
             });
             yield entry.save();

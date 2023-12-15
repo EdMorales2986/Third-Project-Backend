@@ -51,7 +51,7 @@ const createEntries = async function (series: TvResult[]) {
       if (!trailer) {
         entry.trailerURL = "not available";
       } else {
-        entry.trailerURL = `https://www.youtube.com/watch?v=${trailer?.key}`;
+        entry.trailerURL = `https://www.youtube.com/embed/${trailer?.key}`;
       }
     });
     await entry.save();
@@ -136,7 +136,7 @@ export const filterByGenre = async function (req: Request, res: Response) {
     }).lean();
 
     if (!series || series.length === 0) {
-      return res.status(400).json({ msg: "Movies not found" });
+      return res.status(400).json({ msg: "Series not found" });
     }
 
     return res.status(200).json(series);

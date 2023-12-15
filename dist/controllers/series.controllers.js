@@ -56,7 +56,7 @@ const createEntries = function (series) {
                     entry.trailerURL = "not available";
                 }
                 else {
-                    entry.trailerURL = `https://www.youtube.com/watch?v=${trailer === null || trailer === void 0 ? void 0 : trailer.key}`;
+                    entry.trailerURL = `https://www.youtube.com/embed/${trailer === null || trailer === void 0 ? void 0 : trailer.key}`;
                 }
             });
             yield entry.save();
@@ -141,7 +141,7 @@ const filterByGenre = function (req, res) {
                 genres: { $in: genre },
             }).lean();
             if (!series || series.length === 0) {
-                return res.status(400).json({ msg: "Movies not found" });
+                return res.status(400).json({ msg: "Series not found" });
             }
             return res.status(200).json(series);
         }

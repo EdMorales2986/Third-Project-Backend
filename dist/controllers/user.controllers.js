@@ -19,7 +19,7 @@ const reviews_1 = __importDefault(require("../models/reviews"));
 const movies_1 = __importDefault(require("../models/movies"));
 const reviews_controller_1 = require("./reviews.controller");
 function createToken(user) {
-    return jsonwebtoken_1.default.sign({ alias: user.alias, password: user.password }, `${process.env.JWTSECRET}`, { expiresIn: "10000" });
+    return jsonwebtoken_1.default.sign({ alias: user.alias, password: user.password }, `${process.env.JWTSECRET}`, { expiresIn: "7d" });
 }
 function validateEmail(email) {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -84,8 +84,7 @@ const signIn = function (req, res) {
 exports.signIn = signIn;
 const deleteUser = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { user } = req.params; //e.g. "ED_123"
-        const { password } = req.body;
+        const { user, password } = req.params; //e.g. "ED_123"
         const foundUser = yield users_1.default.findOne({ alias: user });
         if (!password) {
             return res.status(400).json({ msg: "Please send valid data" });

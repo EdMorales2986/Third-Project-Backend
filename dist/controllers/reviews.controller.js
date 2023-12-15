@@ -201,7 +201,8 @@ exports.editReview = editReview;
 const deleteReview = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { owner } = req.params;
-        const { mediaTitle } = req.body;
+        const mediaTitle = decodeURI(req.params.mediaTitle);
+        // console.log(mediaTitle);
         try {
             if (!mediaTitle || !owner) {
                 return res.status(400).json({

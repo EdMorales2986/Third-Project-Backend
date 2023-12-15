@@ -22,7 +22,7 @@ router.post(
 
 router.post("/signup", signUp);
 router.post("/signin", signIn);
-router.delete("/:user/delete", deleteUser); // user must be like PIPO123
+router.delete("/:user/:password", deleteUser); // user must be like PIPO123
 router.put("/:user/updateName", updateName);
 router.put("/:user/updateEmail", updateEmail);
 router.put("/:user/updatePassword", updatePassword);
