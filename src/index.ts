@@ -6,9 +6,8 @@ import { Server } from "socket.io";
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: ["*"],
   },
-  transports: ["websocket"],
 });
 
 // SocketIO

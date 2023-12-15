@@ -10,9 +10,8 @@ const socket_io_1 = require("socket.io");
 const server = (0, http_1.createServer)(app_1.default);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: "*",
+        origin: ["*"],
     },
-    transports: ["websocket"],
 });
 // SocketIO
 io.on("connection", (socket) => {
