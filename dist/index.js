@@ -10,8 +10,15 @@ const socket_io_1 = require("socket.io");
 const server = (0, http_1.createServer)(app_1.default);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: ["*"],
+        origin: [
+            "*",
+            "http://localhost:4000",
+            "http://localhost:8100",
+            "https://tmdb-for-a-angularmovile.onrender.com",
+        ],
+        methods: ["GET", "POST"],
     },
+    transports: ["websocket", "polling"],
 });
 // SocketIO
 io.on("connection", (socket) => {
