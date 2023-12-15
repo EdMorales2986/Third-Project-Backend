@@ -8,7 +8,12 @@ require("./database");
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const server = (0, http_1.createServer)(app_1.default);
-const io = new socket_io_1.Server(server);
+const io = new socket_io_1.Server(server, {
+    cors: {
+        origin: "*",
+    },
+    transports: ["websocket"],
+});
 // SocketIO
 io.on("connection", (socket) => {
     console.log("a user connected");
